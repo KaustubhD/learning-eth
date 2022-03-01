@@ -5,26 +5,38 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 
 contract Wallet is Ownable {
 
-    mapping(address => uint) public allowance;
+    mapping(address => uint) public allowanceBalance;
 
     // Set how much a user is allowed to withdraw
-    function setAllowanceAmount(address _to, uint _amount) public onlyOwner {
-        allowance[_to] = _amount;
+    function setAllowanceBalance(address _to, uint _amount) public onlyOwner {
+        allowanceBalance[_to] = _amount;
     }
 
-    function withdrawMoney(address payable _to, uint _amount) public ownerOrValidAmount(_amount) {
+    function withdraw(address payable _to, uint _amount) public ownerOrValidAmount(_amount) {
+        require(_amount <= address(this).balance, "Funds not enough in the smart contract");
+        if (!_isOwner()) {
+            _decreaseBalance(_to, _amount);
+        }
         _to.transfer(_amount);
     }
 
     modifier ownerOrValidAmount(uint _amount) {
-        require(owner() == _msgSender() || allowance[msg.sender] >= _amount, "Invalid operation");
+        require(_isOwner() || allowanceBalance[msg.sender] >= _amount, "Invalid operation");
         _;
+    }
+
+    function _decreaseBalance(address _to, uint _amount) internal {
+        allowanceBalance[_to] -= _amount;
+    }
+
+    function _isOwner() internal view returns(bool) {
+        return owner() == _msgSender();
     }
 
     receive() external payable {
 
     }
-    
+
     fallback() external payable {
 
     }
