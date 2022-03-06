@@ -28,6 +28,7 @@ class App extends Component {
         ItemContract.networks[this.networkId]?.address
       );
 
+      this.listenBlockChainEvents();
       this.setState({ ...this.state, isLoaded: true });
     } catch (error) {
       alert(
@@ -36,6 +37,15 @@ class App extends Component {
       console.error(error);
     }
   };
+
+  listenBlockChainEvents = async () => {
+    this.itemManagerInstance.events.SupplyChainStep.on('data', async (evt) => {
+      const itemIndex = evt.returnValues._itemIndex;
+      let itemObj = this.itemManagerInstance.methods.items(itemIndex).call();
+
+      alert(`Item ${itemObj._id} was paid for. Ready for delivery`);
+    })
+  }
 
   handleCreateItem = async (event) => {
     const {itemName, itemPrice} = this.state;
