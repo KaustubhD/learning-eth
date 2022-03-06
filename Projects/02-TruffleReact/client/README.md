@@ -11,3 +11,7 @@ Steps to run:
 
 3. `npm start` inside client folder in a different shell
 	Starts the react dev server
+
+4. `truffle test` in a different shell
+	Runs the unit tests under test directory
+	Run `truffle test <test file path>.js` to run a specific test file
