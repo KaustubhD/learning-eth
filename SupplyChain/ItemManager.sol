@@ -2,8 +2,9 @@
 pragma solidity ^0.8.7;
 
 import "./Item.sol";
+import "./Ownable.sol";
 
-contract ItemManager {
+contract ItemManager is Ownable {
     
     enum SupplyChainState {
         Created,
@@ -48,7 +49,7 @@ contract ItemManager {
         emit SupplyChainStep(_index, uint(items[_index]._state), address(items[_index]._item));
     }
 
-    function triggerDelivery(uint _index) public {
+    function triggerDelivery(uint _index) public onlyOwner {
         require(items[_index]._state < SupplyChainState.Paid, "Item not yet paid for");
         require(items[_index]._state > SupplyChainState.Paid, "Item already further in the chain");
 
