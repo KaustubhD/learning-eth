@@ -11,29 +11,31 @@ class App extends Component {
 
   componentDidMount = async () => {
     try {
-      // Get network provider and web3 instance.
       this.web3 = await getWeb3()
-
-      // Use web3 to get the user's accounts.
       this.accounts = await this.web3.eth.getAccounts()
 
-      // Get the contract instance.
       const networkId = await this.web3.eth.net.getId()
-      // const deployedNetwork = await t
+
+      const tokenContractAddress = TokenContract.networks[networkId] && TokenContract.networks[networkId].address
       this.tokenInstance = new this.web3.eth.Contract(
         TokenContract.abi,
-        TokenContract.networks[networkId] && TokenContract.networks[networkId].address
+        tokenContractAddress
       )
+        
+      const tokenSaleContractAddress = TokenSaleContract.networks[networkId] && TokenSaleContract.networks[networkId].address
       this.tokenSaleInstance = new this.web3.eth.Contract(
         TokenSaleContract.abi,
-        TokenSaleContract.networks[networkId] && TokenSaleContract.networks[networkId].address
+        tokenSaleContractAddress
       )
+        
+      const kycAddress = KycContract.networks[networkId] && KycContract.networks[networkId].address
       this.kycInstance = new this.web3.eth.Contract(
         KycContract.abi,
-        KycContract.networks[networkId] && KycContract.networks[networkId].address
+        kycAddress
       )
 
-      this.setState({ ...this.state, isLoaded: true })
+      this.setState({ ...this.state, isLoaded: true, tokenSaleAddress: tokenSaleContractAddress, tokenAddress: tokenContractAddress})
+      console.log(this.state)
     } catch (error) {
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`,
@@ -54,7 +56,6 @@ class App extends Component {
   }
 
   handleKycWhitelist = async () => {
-    console.log(this.accounts)
     await this.kycInstance.methods.setKycCompleted(this.state.kycAddress).send({ from: this.accounts[0] })
     console.log('KYC completed for ' + this.state.kycAddress)
   }
@@ -70,6 +71,17 @@ class App extends Component {
           <span>Add address to allow purchase</span>
           <input type="text" name="kycAddress" value={this.state.kycAddress} placeholder="0x123" onChange={this.handleInputChange}/>
           <button onClick={this.handleKycWhitelist}>Add to whitelist</button>
+        </div>
+        <div>
+          <p>
+            To buy Uno, please send ether to {this.state.tokenSaleAddress}
+          </p>
+          <p>
+            1 UNO = 1 wei (10<sup>18</sup> eth)
+          </p>
+          <p>
+            To see your UNO tokens in metamask add the token using address: {this.state.tokenAddress}
+          </p>
         </div>
       </div>
     )
