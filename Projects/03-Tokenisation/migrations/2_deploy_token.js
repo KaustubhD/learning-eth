@@ -1,8 +1,9 @@
+const dotenv = require('dotenv').config({ path: '../.env' })
 const Token = artifacts.require('UnoToken')
 const TokenSale = artifacts.require('UnoTokenSale')
 
 module.exports = async function(deployer) {
-  const totalSupply = 100000
+  const totalSupply = process.env.TOKEN_TOTAL_SUPPLY
   const addresses = await web3.eth.getAccounts()
 
   await deployer.deploy(Token, totalSupply)

@@ -11,6 +11,9 @@ coverage/
 # production
 build/
 
+# environment
+.env
+
 # contracts built json
 **/contracts/*.json
 

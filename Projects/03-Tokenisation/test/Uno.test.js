@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config({ path: '../.env' })
 const TokenContract = artifacts.require('UnoToken')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
@@ -11,7 +12,7 @@ chai
 
 
 contract('Token test', async (accounts) => {
-  const totalSupply = new BN(100000)
+  const totalSupply = new BN(process.env.TOKEN_TOTAL_SUPPLY)
   const [deployerAccount, recipientAccount, anotherAccount] = accounts
   let instance
 
